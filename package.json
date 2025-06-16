@@ -1,0 +1,30 @@
+{
+  "name": "maintainx-api-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npm run build && npm run start",
+    "test": "jest --detectOpenHandles --verbose",
+    "test:watch": "jest --watch --detectOpenHandles --verbose"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.0.1",
+    "jest": "^30.0.0",
+    "prettier": "3.5.3",
+    "ts-jest": "^29.4.0"
+  }
+}
