@@ -6,7 +6,7 @@ process.env.MAINTAINX_API_KEY = "test_api_key";
 process.env.MAINTAINX_ORG_ID = "test_org_id";
 
 import axios from "axios";
-import { WorkOrderWebhookPayload } from "../src/types";
+import { WorkOrderPayload, WorkOrderWebhookPayload } from "../src/types";
 
 // Mock axios globally to prevent actual HTTP requests during tests.
 jest.mock("axios");
@@ -71,10 +71,10 @@ describe("processWebhookEvent", () => {
     });
 
     const payload: WorkOrderWebhookPayload = {
-      workOrderId: 101,
+      workOrderId: 404,
       orgId: 456,
       occurredAt: new Date().toISOString(),
-      newWorkOrder: { title: "High Priority Test", priority: "HIGH" },
+      newWorkOrder: undefined, // Simulate newWorkOrder missing from webhook
     };
 
     await processWebhookEvent(payload);
@@ -130,10 +130,10 @@ describe("processWebhookEvent", () => {
     mockedAxios.patch.mockRejectedValueOnce(mockErrorResponse);
 
     const payload: WorkOrderWebhookPayload = {
-      workOrderId: 202,
+      workOrderId: 404,
       orgId: 456,
       occurredAt: new Date().toISOString(),
-      newWorkOrder: { title: "Medium Priority Test", priority: "MEDIUM" },
+      newWorkOrder: undefined, // Simulate newWorkOrder missing from webhook
     };
 
     await processWebhookEvent(payload);
@@ -165,10 +165,10 @@ describe("processWebhookEvent", () => {
     mockedAxios.patch.mockRejectedValueOnce(mockErrorResponse);
 
     const payload: WorkOrderWebhookPayload = {
-      workOrderId: 303,
+      workOrderId: 404,
       orgId: 456,
       occurredAt: new Date().toISOString(),
-      newWorkOrder: { title: "Low Priority Test", priority: "LOW" },
+      newWorkOrder: undefined, // Simulate newWorkOrder missing from webhook
     };
 
     await processWebhookEvent(payload);

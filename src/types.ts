@@ -9,12 +9,27 @@ export type WorkOrderPriority = "HIGH" | "LOW" | "MEDIUM" | "NONE";
  * Defines the structure of a Work Order object as received in webhook payloads or used in API calls.
  */
 export interface WorkOrderPayload {
-  priority?: WorkOrderPriority;
-  dueDate?: string; // ISO 8601 string
+  // priority?: WorkOrderPriority;
+  // dueDate?: string; // ISO 8601 string
+  // title: string;
+  // assetId?: number;
+  // locationId?: number;
+  // description?: string;
+  assetId: number;
+  assigneeIds: number[];
+  categories: string[];
+  description: string;
+  dueDate: string;
+  estimatedTime: number;
+  extraFields: Record<string, any>;
+  locationId: number;
+  parts: any[];
+  priority: WorkOrderPriority;
+  startDate: string;
+  teamIds: number[];
   title: string;
-  assetId?: number;
-  locationId?: number;
-  description?: string;
+  vendorIds: number[];
+  costs: Record<string, number>;
 }
 
 /**
