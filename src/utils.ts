@@ -56,14 +56,8 @@ export const verifyWebhookSignature = (
   secret: string,
   toleranceMinutes: number = 5,
 ): boolean => {
-  if (!signatureHeader) {
-    console.error("[verifyWebhookSignature] Signature header is missing.");
-    return false;
-  }
-  if (!rawBody) {
-    console.error(
-      "[verifyWebhookSignature] Raw body is missing for verification.",
-    );
+  if (!signatureHeader || !rawBody) {
+    console.error("Missing header or raw body. Cannot verify.");
     return false;
   }
 
@@ -71,37 +65,60 @@ export const verifyWebhookSignature = (
   const timestamp = timestampPart ? timestampPart.split("=")[1] : null;
   const signature = v1SignaturePart ? v1SignaturePart.split("=")[1] : null;
 
+  console.log("Parsed timestamp:", timestamp);
+  console.log("Parsed signature:", signature);
+
   if (!timestamp || !signature) {
     console.error("[verifyWebhookSignature] Malformed signature header parts.");
     return false;
   }
 
   const signedPayload = `${timestamp}.${rawBody.toString("utf8")}`;
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(signedPayload, "utf8")
-    .digest("hex");
+  console.log("Signed Payload (for HMAC):", signedPayload);
 
-  // Compare signatures in a time-constant manner to prevent timing attacks
-  const isValidSignature = crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature),
-  );
+  try {
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(signedPayload, "utf8")
+      .digest("hex");
+    console.log("Expected Signature (calculated):", expectedSignature);
 
-  // Check for replay attacks
-  const toleranceMs = toleranceMinutes * 60 * 1000;
-  const now = Date.now();
-  const receivedTimestamp = parseInt(timestamp, 10) * 1000; // Convert seconds to milliseconds
-  const isFresh = now - receivedTimestamp < toleranceMs;
-
-  if (!isValidSignature) {
-    console.error("[verifyWebhookSignature] Signature mismatch.");
-  }
-  if (!isFresh) {
-    console.error(
-      `[verifyWebhookSignature] Webhook timestamp too old. Received: ${new Date(receivedTimestamp).toISOString()}, Now: ${new Date(now).toISOString()}`,
+    const isValidSignature = crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature),
     );
-  }
+    console.log("isValidSignature:", isValidSignature);
 
-  return isValidSignature && isFresh;
+    // Check for replay attacks
+    const toleranceMs = toleranceMinutes * 60 * 1000;
+    const now = Date.now();
+    const receivedTimestamp = parseInt(timestamp, 10) * 1000; // Convert seconds to milliseconds
+    const isFresh = Math.abs(now - receivedTimestamp) < toleranceMs; // Use Math.abs for future or past tolerance
+    console.log(
+      "now (ms):",
+      now,
+      "Received Timestamp (ms):",
+      receivedTimestamp,
+      "Diff (ms):",
+      now - receivedTimestamp,
+    );
+    console.log("Tolerance (ms):", toleranceMs, "Is Fresh:", isFresh);
+
+    if (!isValidSignature) {
+      console.error("[verifyWebhookSignature] Signature mismatch.");
+    }
+    if (!isFresh) {
+      console.error(
+        `[verifyWebhookSignature] Webhook timestamp too old/future. Received: ${new Date(receivedTimestamp).toISOString()}, Now: ${new Date(now).toISOString()}`,
+      );
+    }
+
+    return isValidSignature && isFresh;
+  } catch (e: any) {
+    console.error(
+      "[verifyWebhookSignature] Error during HMAC calculation or comparison:",
+      e.message,
+    );
+    return false;
+  }
 };
