@@ -52,8 +52,8 @@ export async function processWebhookEvent(
     `[processWebhookEvent] Calculated new due date for WO ${workOrderId} (Priority: ${currentPriority}): ${calculatedDueDate}`,
   );
 
-  console.log("--- API Key Debug ---");
-  console.log(`Full MAINTAINX_API_KEY (DEBUG):${MAINTAINX_API_KEY}`);
+  // console.log("--- API Key Debug ---");
+  // console.log(`Full MAINTAINX_API_KEY (DEBUG):${MAINTAINX_API_KEY}`);
 
   // Update Work Order in MaintainX
   try {
